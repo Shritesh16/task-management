@@ -1,11 +1,18 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import CreateProject from "./CreateProject";
 
-const Header = () => {
+const Header = ({page}) => {
    
     const [searchText , setSearchText] = useState("");
     const [debouncedText , setDebouncedText] = useState(searchText);
+    const [open, setOpen] = useState(false);
+  
+      // Open dialog
+    const handleOpen = () => setOpen(true);
 
+      // Close dialog
+    const handleClose = () => setOpen(false);
     
 
     const handleSearchChange =(e)=>{
@@ -52,26 +59,28 @@ const Header = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        marginTop: { xs: "4px", sm: "4px", md: "4px" },
+
+        gap: { xs: "0px", sm: "28px", md: "225px" , lg:"640px" },
         padding:"5px"
       }}
     >
       {/* Title & Subtitle */}
-      <Box>
-        <Typography variant="h5" sx={{color:"white",fontWeight:"bold"}}>Projects</Typography>
-        <Typography sx={{color:"#d1d5db"}}>A list of all Projects</Typography>
+      <Box >
+        <Typography variant="h5" sx={{color:"white",fontWeight:"bold"}}>{page}</Typography>
+        <Typography noWrap sx={{color:"#d1d5db"}}>{`A list of all ${page}`}</Typography>
       </Box>
 
       {/* Search Input */}
-      <Box sx={{ display: "flex", gap: 15 }}>
+      <Box sx={{ display: "flex", gap: {xs:6 , sm: 8 , md:15} }}>
         <TextField
           type="search"
-          placeholder="Search Projects"
+          placeholder={`Search ${page}`}
           value={searchText}
           onChange={handleSearchChange}
           onKeyDown={handleKeyDown}
           sx={{
-            width: "300px",
+            // width: "300px",
+            width: { xs: "160px", sm: "200px", md: "300px" },
             color: "white",
             backgroundColor: "#1f2937",
             borderRadius: "25px",
@@ -79,19 +88,30 @@ const Header = () => {
             input: { color: "white" },
           }}
         />
+        
+          {/* Filter Icon */}
+        {page === "Task" && (<></>)}
+
         {/* Button */}
         <Button
           variant="contained"
+          onClick={handleOpen}
           sx={{
+            width:"140px",
             backgroundColor: " #5046e5",
             color: "white",
             borderRadius: "10px",
             height: "55px",
           }}
         >
-          Add Project
+         {` Add ${page}`}
         </Button>
       </Box>
+
+
+      {/* Dialog */}
+      <CreateProject handleClose={handleClose} open={open}/>
+      
     </Box>
   );
 };

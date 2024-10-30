@@ -113,7 +113,7 @@ const Navbar = ()=> {
           >
             TASK
           </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' , gap:"80px"}}}>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' , gap:"100px"}}}>
             {pages.map((page) => (
               <Button
                 key={page}

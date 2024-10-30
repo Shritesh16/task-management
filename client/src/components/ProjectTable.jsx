@@ -48,7 +48,7 @@ const Initialrows = [
   
 ];
 
-const ProjectTable = () => {
+const ProjectTable = ({page}) => {
   const [rows, setRows] = useState(Initialrows);
   const [editCell, setEditCell] = useState({ rowIndex: null, field: "" });
 
@@ -91,7 +91,7 @@ const ProjectTable = () => {
       <TableContainer>
         {/* Header for Projects page */}
 
-        <Header/>
+        <Header page={page}/>
         <br />
 
         {/* Table for Projects page */}
@@ -178,8 +178,8 @@ const ProjectTable = () => {
           </TableBody>
         </Table>
 
+        <br/>
         <br />
-         <br />
         <Pagination/>
       </TableContainer>
     </AppBar>

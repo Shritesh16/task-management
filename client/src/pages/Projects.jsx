@@ -6,12 +6,12 @@ import Pagination from "../components/Pagination"
 
 
 const Projects = ()=>{
-
+    const page = "Project";
 
     return(
         <>
             <Navbar/> 
-            <ProjectTable />
+            <ProjectTable page={page}/>
             {/* <Pagination/> */}
         </>
     )

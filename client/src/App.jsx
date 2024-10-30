@@ -5,6 +5,7 @@ import Navbar from './components/Navbar'
 import Login from './pages/Login'
 import Projects from './pages/Projects'
 import Pagination from './components/Pagination'
+import Tasks from './pages/Tasks'
 
 function App() {
   
@@ -13,8 +14,8 @@ function App() {
     <Box>
         {/* <Login/> */}
         {/* <Navbar/> */}
-        <Projects/>
-        
+        {/* <Projects/> */}
+        <Tasks/>
     </Box>
   )
 }
