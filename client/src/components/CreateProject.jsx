@@ -11,8 +11,12 @@ import {
 import { useForm } from "react-hook-form";
 
 const CreateProject = ({ handleClose, open }) => {
-
-  const { register, handleSubmit, reset ,formState:{errors} } = useForm();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
 
   //Handle Form submission
   const onSubmit = (data) => {
@@ -54,13 +58,26 @@ const CreateProject = ({ handleClose, open }) => {
               <TextField
                 fullWidth
                 variant="filled"
-                
-                {...register("projectTitle", { required: "Enter project title" })}
+                {...register("projectTitle", {
+                  required: "Enter project title",
+                })}
                 errors={!!errors.projectTitle}
-                helperText={errors.projectTitle ? <Typography sx={{color:"red"}}>{errors.projectTitle.message}</Typography> : ""}
+                helperText={
+                  errors.projectTitle ? (
+                    <Typography sx={{ color: "red" }}>
+                      {errors.projectTitle.message}
+                    </Typography>
+                  ) : (
+                    ""
+                  )
+                }
                 InputProps={{
                   disableUnderline: true,
-                  style: { color: "white", backgroundColor: "#1f2937", borderRadius:"10px" },
+                  style: {
+                    color: "white",
+                    backgroundColor: "#1f2937",
+                    borderRadius: "10px",
+                  },
                 }}
               />
 
@@ -71,15 +88,28 @@ const CreateProject = ({ handleClose, open }) => {
               <TextField
                 fullWidth
                 variant="filled"
-                
                 multiline
                 rows={4}
-                {...register("description", { required: "Enter project description" })}
+                {...register("description", {
+                  required: "Enter project description",
+                })}
                 errors={!!errors.description}
-                helperText={errors.description ? <Typography sx={{color:"red"}}>{errors.description.message}</Typography> : ""}
+                helperText={
+                  errors.description ? (
+                    <Typography sx={{ color: "red" }}>
+                      {errors.description.message}
+                    </Typography>
+                  ) : (
+                    ""
+                  )
+                }
                 InputProps={{
                   disableUnderline: true,
-                  style: { color: "white", backgroundColor: "#1f2937",borderRadius:"10px" },
+                  style: {
+                    color: "white",
+                    backgroundColor: "#1f2937",
+                    borderRadius: "10px",
+                  },
                 }}
               />
             </Box>

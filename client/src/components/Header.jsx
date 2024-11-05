@@ -1,77 +1,82 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import CreateProject from "./CreateProject";
+import CreateTask from "./CreateTask";
 
-const Header = ({page}) => {
-   
-    const [searchText , setSearchText] = useState("");
-    const [debouncedText , setDebouncedText] = useState(searchText);
-    const [open, setOpen] = useState(false);
-  
-      // Open dialog
-    const handleOpen = () => setOpen(true);
+const Header = ({ page }) => {
+  const [searchText, setSearchText] = useState("");
+  const [debouncedText, setDebouncedText] = useState(searchText);
+  const [open, setOpen] = useState(false);
 
-      // Close dialog
-    const handleClose = () => setOpen(false);
-    
+  // Open dialog
+  const handleOpen = () => setOpen(true);
 
-    const handleSearchChange =(e)=>{
-         setSearchText(e.target.value)
+  // Close dialog
+  const handleClose = () => setOpen(false);
+
+  const handleSearchChange = (e) => {
+    setSearchText(e.target.value);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      setDebouncedText(searchText);
     }
+  };
 
+  //get data from server for pojects based on Searched title
+  const fetchData = async (text) => {
+    console.log(text);
+  };
 
-    const handleKeyDown = (e)=>{
+  //Debounching
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      setDebouncedText(searchText);
+    }, 300);
 
-         if(e.key === "Enter"){
-             setDebouncedText(searchText)
-         }
+    return () => clearTimeout(timerId);
+  }, [searchText]);
+
+  useEffect(() => {
+    if (debouncedText) {
+      fetchData(debouncedText);
     }
-    
-    //get data from server for pojects based on Searched title
-    const fetchData = async(text)=>{
-         console.log(text)
-    }
+  }, [debouncedText]);
 
-
-    //Debounching 
-    useEffect(()=>{
-
-      const timerId = setTimeout(()=>{
-          setDebouncedText(searchText)
-      },300)
-    
-          return ()=>clearTimeout(timerId)
-    },[searchText])
-
-    useEffect(()=>{
-        if(debouncedText){
-            fetchData(debouncedText)
-        }
-
-
-    },[debouncedText])
-
-
-  
   return (
     <Box
       sx={{
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-
-        gap: { xs: "0px", sm: "28px", md: "225px" , lg:"640px" },
-        padding:"5px"
+        //  640   225px
+        gap: { xs: "0px", sm: "195px", md: "337px", lg: "670px" },
+        padding: "5px",
       }}
     >
       {/* Title & Subtitle */}
-      <Box >
-        <Typography variant="h5" sx={{color:"white",fontWeight:"bold"}}>{page}</Typography>
-        <Typography noWrap sx={{color:"#d1d5db"}}>{`A list of all ${page}`}</Typography>
+      <Box>
+        <Typography variant="h5" sx={{ color: "white", fontWeight: "bold" }}>
+          {page}
+        </Typography>
+        <Typography
+          noWrap
+          sx={{ color: "#d1d5db" }}
+        >{`A list of all ${page}`}</Typography>
       </Box>
 
       {/* Search Input */}
-      <Box sx={{ display: "flex", gap: {xs:6 , sm: 8 , md:15} }}>
+      <Box sx={{ display: "flex", gap: { xs: 6, sm: 8, md: 15 } }}>
         <TextField
           type="search"
           placeholder={`Search ${page}`}
@@ -88,30 +93,32 @@ const Header = ({page}) => {
             input: { color: "white" },
           }}
         />
-        
-          {/* Filter Icon */}
-        {page === "Task" && (<></>)}
+
+        {/* Filter Icon */}
+        {page === "Task" && <></>}
 
         {/* Button */}
         <Button
           variant="contained"
           onClick={handleOpen}
           sx={{
-            width:"140px",
+            width: "140px",
             backgroundColor: " #5046e5",
             color: "white",
             borderRadius: "10px",
             height: "55px",
           }}
         >
-         {` Add ${page}`}
+          {` Add ${page}`}
         </Button>
       </Box>
 
-
       {/* Dialog */}
-      <CreateProject handleClose={handleClose} open={open}/>
-      
+      {page === "Project" ? (
+        <CreateProject handleClose={handleClose} open={open} />
+      ) : (
+        <CreateTask handleClose={handleClose} open={open} />
+      )}
     </Box>
   );
 };

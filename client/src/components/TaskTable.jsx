@@ -5,14 +5,13 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import DeleteIcon from "@mui/icons-material/Delete";
+
 // import Paper from '@mui/material/Paper';
 import {
   AppBar,
-  Button,
-  IconButton,
+  MenuItem,
+  Select,
   TextField,
-  
 } from "@mui/material";
 import { useState } from "react";
 import Header from "./Header";
@@ -23,41 +22,51 @@ const Initialrows = [
     title: "Frozen yoghurt",
     desciption:
       "Frozen yoghurtFrozen yoghurtFrozen yoghurt Frozen yoghurtFrozen",
+    date : "26/10/2024",
+    priority: "Critical",
+    status : "To-Do",
+
   },
   {
     title: "Frozen yoghurt",
     desciption:
       "Frozen yoghurtFrozen yoghurtFrozen yoghurt Frozen yoghurtFrozen",
+    date : "26/10/2024",
+    priority: "Critical",
+    status : "To-Do",
   },
   {
     title: "Frozen yoghurt",
     desciption:
       "Frozen yoghurtFrozen yoghurtFrozen yoghurt Frozen yoghurtFrozen",
+    date : "26/10/2024",
+    priority: "Critical",
+    status : "To-Do",
   },
   {
     title: "Frozen yoghurt",
     desciption:
       "Frozen yoghurtFrozen yoghurtFrozen yoghurt Frozen yoghurtFrozen",
+    date : "26/10/2024",
+    priority: "Critical",
+    status : "To-Do",
   },
   {
     title: "Frozen yoghurt",
     desciption:
       "Frozen yoghurtFrozen yoghurtFrozen yoghurt Frozen yoghurtFrozen",
+    date : "26/10/2024",
+    priority: "Critical",
+    status : "To-Do",
   },
   
 ];
 
-const ProjectTable = ({page}) => {
+const TaskTable = ({page}) => {
   const [rows, setRows] = useState(Initialrows);
   const [editCell, setEditCell] = useState({ rowIndex: null, field: "" });
 
-  const handleView = (index) => {
-    //  Navigate to task page
-    console.log(index);
-  };
-  const handleDelete = (index) => {
-    console.log(index);
-  };
+
 
   const handleCellClick = (rowIndex, field) => {
     // console.log(rowIndex,field)
@@ -76,7 +85,14 @@ const ProjectTable = ({page}) => {
     setEditCell({ rowIndex: null, field: "" });
   };
 
-  // aria-label="simple table"   component={Paper}
+  const handleStatusChange = (e, rowIndex) => {
+    const newRows = [...rows];
+    newRows[rowIndex].Status = e.target.value;
+    setRows(newRows);
+  };
+ 
+
+
   return (
     <AppBar
       position="fixed"
@@ -88,7 +104,7 @@ const ProjectTable = ({page}) => {
       }}
     >
       <TableContainer>
-
+        
         {/* Header for Projects page */}
         <Header page={page}/>
         <br />
@@ -99,8 +115,9 @@ const ProjectTable = ({page}) => {
             <TableRow>
               <TableCell sx={{ color: "white" }}>Title</TableCell>
               <TableCell sx={{ color: "white" }}>Description</TableCell>
-              <TableCell sx={{ color: "white" }}></TableCell>
-              <TableCell sx={{ color: "white" }}></TableCell>
+              <TableCell sx={{ color: "white" }}>Due Date</TableCell>
+              <TableCell sx={{ color: "white" }}>priority</TableCell>
+              <TableCell sx={{ color: "white" }}>Status</TableCell>
               {/* <TableCell align="right">Protein&nbsp;(g)</TableCell> */}
             </TableRow>
           </TableHead>
@@ -149,28 +166,35 @@ const ProjectTable = ({page}) => {
                   )}
                 </TableCell>
 
-                <TableCell>
-                  <Button
-                    sx={{
-                      color: "#5046e5",
-                      fontWeight: "bold",
-                      fontSize: "medium",
-                    }}
-                    onClick={() => handleView(index)}
-                  >
-                    View
-                  </Button>
+                <TableCell sx={{color:"white"}}>
+                  
+                   {row.date}
+                  
                 </TableCell>
 
-                <TableCell>
-                  <IconButton
-                    aria-label="delete"
-                    sx={{ color: "white" }}
-                    onClick={() => handleDelete(index)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+                <TableCell sx={{color:"white"}}>
+                  
+                    {row.priority}
+                
                 </TableCell>
+
+                <TableCell sx={{ color: "white" }}>
+                    <Select
+                      value={row.status}
+                      onChange={(e) => handleStatusChange(e, index)}
+                      sx={{
+                        width:"125px",
+                        color: "white",
+                        ".MuiSelect-select": { padding: "8px 32px 8px 8px" },
+                        ".MuiOutlinedInput-notchedOutline": { borderColor: "white" },
+                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#5046e5" },
+                      }}
+                     >
+                       <MenuItem value="To-Do">To-Do</MenuItem>
+                       <MenuItem value="In Progress">In Progress</MenuItem>
+                       <MenuItem value="Complete">Complete</MenuItem>
+                    </Select>
+                  </TableCell>
                 {/* <TableCell align="right">{row.protein}</TableCell> */}
               </TableRow>
             ))}
@@ -185,4 +209,17 @@ const ProjectTable = ({page}) => {
   );
 };
 
-export default ProjectTable;
+export default TaskTable;
+
+
+
+
+
+
+//   const handleView = (index) => {
+//     //  Navigate to task page
+//     console.log(index);
+//   };
+//   const handleDelete = (index) => {
+//     console.log(index);
+//   };

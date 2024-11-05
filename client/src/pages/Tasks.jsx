@@ -1,5 +1,6 @@
 import Navbar from "../components/Navbar"
 import ProjectTable from "../components/ProjectTable"
+import TaskTable from "../components/TaskTable";
 
 
 
@@ -13,7 +14,7 @@ const Tasks = ()=>{
   return (
     <>
       <Navbar/> 
-      <ProjectTable page={page}/>
+      <TaskTable page={page}/>
     </>
   )
 }
