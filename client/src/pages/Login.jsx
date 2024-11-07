@@ -10,40 +10,58 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../Redux/authReducer/action";
-//import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const theme = createTheme();
 
 const Login = () => {
   
-  const {register,handleSubmit,formState:{errors}} = useForm()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const dispatch = useDispatch();
-  const {isAuth} = useSelector((state)=> state.authReducer)
-  const {isLogged} = isAuth
-  //const navigate = useNavigate();
+  const { user } = useSelector((state) => state.authReducer);
+  const navigate = useNavigate();
 
-  const onSubmit = (data)=>{
-      dispatch(getUser(data)) 
-  }
+
+  // useEffect(()=>{
+  //   const storedUser = JSON.parse(localStorage.getItem("user"));
+  //   if(storedUser?.isLogged && storedUser?.token){
+  //      navigate("/project")
+  //   }
+    
+  // },[navigate])
+
+
+  const onSubmit = (data) => {
+    dispatch(getUser(data));
+  };
+ 
+  useEffect(()=>{
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+     if(storedUser?.isLogged){
+       navigate("/project")
+     }
+     
+  },[user,navigate])
+
   
-//   if(isLogged){
-//      navigate("/home")
-//   }
-  
-
-
-
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
-          sx={{
-            // marginTop: 1,
-            // display: "flex",
-            // flexDirection: "column",
-            // alignItems: "center",
-          }}
+          sx={
+            {
+              // marginTop: 1,
+              // display: "flex",
+              // flexDirection: "column",
+              // alignItems: "center",
+            }
+          }
         >
           <Box sx={{ display: "flex", justifyContent: "center" }}>
             <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
@@ -60,11 +78,11 @@ const Login = () => {
           </Typography>
 
           {/* Display login error message */}
-          {isLogged === false && (
+          {user?.isLogged === false && (
             <Typography
               component="p"
               variant="body2"
-              sx={{ color: "red", textAlign: "center", mt: 2}}
+              sx={{ color: "red", textAlign: "center", mt: 2 }}
             >
               Invalid user credentials
             </Typography>

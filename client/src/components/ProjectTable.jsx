@@ -17,6 +17,7 @@ import {
 import { useState } from "react";
 import Header from "./Header";
 import Pagination from "./Pagination";
+import { Link } from "react-router-dom";
 
 const Initialrows = [
   {
@@ -150,7 +151,7 @@ const ProjectTable = ({page}) => {
                 </TableCell>
 
                 <TableCell>
-                  <Button
+                  <Link to="/task"><Button
                     sx={{
                       color: "#5046e5",
                       fontWeight: "bold",
@@ -159,7 +160,8 @@ const ProjectTable = ({page}) => {
                     onClick={() => handleView(index)}
                   >
                     View
-                  </Button>
+                  </Button></Link>
+
                 </TableCell>
 
                 <TableCell>
