@@ -11,11 +11,18 @@ import {
 import { useEffect, useState } from "react";
 import CreateProject from "./CreateProject";
 import CreateTask from "./CreateTask";
+import { useSelector } from "react-redux";
 
 const Header = ({ page }) => {
   const [searchText, setSearchText] = useState("");
   const [debouncedText, setDebouncedText] = useState(searchText);
   const [open, setOpen] = useState(false);
+
+  // const data = useSelector((state) => state.authReducer);
+  // const role = data.user?.user?.role
+
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const role = storedUser.user.role
 
   // Open dialog
   const handleOpen = () => setOpen(true);
@@ -107,6 +114,8 @@ const Header = ({ page }) => {
             color: "white",
             borderRadius: "10px",
             height: "55px",
+            opacity: page ==="Project" && role !=="Manager" ? 0.3 : 1,
+            pointerEvents:page ==="Project" && role !=="Manager" ? "none" :"auto"
           }}
         >
           {` Add ${page}`}

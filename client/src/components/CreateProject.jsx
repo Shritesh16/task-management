@@ -11,6 +11,7 @@ import {
 import { useForm } from "react-hook-form";
 
 const CreateProject = ({ handleClose, open }) => {
+  
   const {
     register,
     handleSubmit,

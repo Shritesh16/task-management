@@ -4,7 +4,9 @@ const jwt = require("jsonwebtoken")
 require("dotenv").config()
 const cors = require("cors");
 const { connection } = require("./config/db");
-const {Usermodel} = require("./models/User.model")
+const {Usermodel} = require("./models/User.model");
+const { Authenticate } = require("./middlewares/Authenticate");
+const { projectRouter } = require("./Routes/project.routes");
 
 const app = express();
 app.use(cors({origin:"*"}))
@@ -15,7 +17,7 @@ app.get("/", (req,res)=>{
      res.send("This is base url")
 })
 
-// Login - POST
+//Login - POST
 app.post("/login", async(req,res)=>{
     try {
         const {email,password} = req.body;
@@ -29,11 +31,16 @@ app.post("/login", async(req,res)=>{
     }
 })
 
+app.use(Authenticate)
+
+app.use("/projects" ,projectRouter)
 
 
 
 
-app.listen(8080, async()=>{
+
+
+app.listen(process.env.PORT, async()=>{
     try {
         await connection
         console.log("Connected to DB")

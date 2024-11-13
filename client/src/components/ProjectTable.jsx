@@ -18,6 +18,7 @@ import { useState } from "react";
 import Header from "./Header";
 import Pagination from "./Pagination";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Initialrows = [
   {
@@ -52,6 +53,16 @@ const ProjectTable = ({page}) => {
   const [rows, setRows] = useState(Initialrows);
   const [editCell, setEditCell] = useState({ rowIndex: null, field: "" });
 
+  // const data = useSelector((state) => state.authReducer);
+  // const role = data.user?.user?.role
+  
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const role = storedUser.user.role
+  // console.log(storedUser.user.role)
+ 
+  
+
+
   const handleView = (index) => {
     //  Navigate to task page
     console.log(index);
@@ -62,7 +73,10 @@ const ProjectTable = ({page}) => {
 
   const handleCellClick = (rowIndex, field) => {
     // console.log(rowIndex,field)
-    setEditCell({ rowIndex, field });
+    if(role === "Manager"){
+      setEditCell({ rowIndex, field });
+    }
+    
   };
 
   const handleCellChange = (e, rowIndex, field) => {
@@ -116,7 +130,7 @@ const ProjectTable = ({page}) => {
                   sx={{ color: "white" }}
                   onClick={() => handleCellClick(index, "title")}
                 >
-                  {editCell.rowIndex === index && editCell.field === "title" ? (
+                  {editCell.rowIndex === index && editCell.field === "title" && role ==="Manager" ? (
                     <TextField
                       value={row.title}
                       onChange={(e) => handleCellChange(e, index, "title")}
@@ -136,7 +150,7 @@ const ProjectTable = ({page}) => {
                   onClick={() => handleCellClick(index, "desciption")}
                 >
                   {editCell.rowIndex === index &&
-                  editCell.field === "desciption" ? (
+                  editCell.field === "desciption" && role ==="Manager" ? (
                     <TextField
                       value={row.desciption}
                       onChange={(e) => handleCellChange(e, index, "desciption")}
@@ -167,7 +181,7 @@ const ProjectTable = ({page}) => {
                 <TableCell>
                   <IconButton
                     aria-label="delete"
-                    sx={{ color: "white" }}
+                    sx={{ color: "white", opacity: role ==="Manager" ? 1 : 0.3 , pointerEvents: role==="Manager" ? "auto":"none" }}
                     onClick={() => handleDelete(index)}
                   >
                     <DeleteIcon />
