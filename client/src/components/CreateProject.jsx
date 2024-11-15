@@ -9,6 +9,8 @@ import {
   Typography,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { createProject } from "../Redux/projectReducer/action";
 
 const CreateProject = ({ handleClose, open }) => {
   
@@ -18,11 +20,16 @@ const CreateProject = ({ handleClose, open }) => {
     reset,
     formState: { errors },
   } = useForm();
+  const dispatch = useDispatch()
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const manager_id = storedUser.user._id
+  const token = storedUser.token
 
   //Handle Form submission
   const onSubmit = (data) => {
     //Post data to respective API of projects
-    console.log(data);
+    const projectData = {...data , manager_id}
+    dispatch(createProject(projectData,token))
     handleClose();
     reset();
   };
@@ -59,14 +66,14 @@ const CreateProject = ({ handleClose, open }) => {
               <TextField
                 fullWidth
                 variant="filled"
-                {...register("projectTitle", {
+                {...register("title", {
                   required: "Enter project title",
                 })}
-                errors={!!errors.projectTitle}
+                errors={!!errors.title}
                 helperText={
-                  errors.projectTitle ? (
+                  errors.title ? (
                     <Typography sx={{ color: "red" }}>
-                      {errors.projectTitle.message}
+                      {errors.title.message}
                     </Typography>
                   ) : (
                     ""

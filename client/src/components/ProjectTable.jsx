@@ -12,84 +12,97 @@ import {
   Button,
   IconButton,
   TextField,
-  
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "./Header";
 import Pagination from "./Pagination";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import {
+  deleteProject,
+  getProject,
+  updateProject,
+} from "../Redux/projectReducer/action";
+import DeleteDialog from "./DeleteDialog";
 
-const Initialrows = [
-  {
-    title: "Frozen yoghurt",
-    desciption:
-      "Frozen yoghurtFrozen yoghurtFrozen yoghurt Frozen yoghurtFrozen",
-  },
-  {
-    title: "Frozen yoghurt",
-    desciption:
-      "Frozen yoghurtFrozen yoghurtFrozen yoghurt Frozen yoghurtFrozen",
-  },
-  {
-    title: "Frozen yoghurt",
-    desciption:
-      "Frozen yoghurtFrozen yoghurtFrozen yoghurt Frozen yoghurtFrozen",
-  },
-  {
-    title: "Frozen yoghurt",
-    desciption:
-      "Frozen yoghurtFrozen yoghurtFrozen yoghurt Frozen yoghurtFrozen",
-  },
-  {
-    title: "Frozen yoghurt",
-    desciption:
-      "Frozen yoghurtFrozen yoghurtFrozen yoghurt Frozen yoghurtFrozen",
-  },
-  
-];
-
-const ProjectTable = ({page}) => {
-  const [rows, setRows] = useState(Initialrows);
+const ProjectTable = ({ page }) => {
+  const [rows, setRows] = useState([]);
+  const [singleProjectUpdate, setsingleProjectUpdate] = useState({});
+  const [projectId, setProjectId] = useState("");
   const [editCell, setEditCell] = useState({ rowIndex: null, field: "" });
 
-  // const data = useSelector((state) => state.authReducer);
-  // const role = data.user?.user?.role
-  
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  const role = storedUser.user.role
-  // console.log(storedUser.user.role)
- 
-  
+  const [openDialog, setOpenDialog] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
 
+  const dispatch = useDispatch();
+  //const {projects} = useSelector((store) => store.projectReducer)
+  //console.log(projects)
+
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const role = storedUser.user.role;
+  const manager_id = storedUser.user._id;
+  const token = storedUser.token;
 
   const handleView = (index) => {
     //  Navigate to task page
     console.log(index);
   };
-  const handleDelete = (index) => {
-    console.log(index);
+
+  const handleDelete = (e, projectId) => {
+    e.preventDefault();
+    console.log("clicked", projectId);
+    dispatch(deleteProject(projectId, token));
+    setOpenDialog(false);
   };
 
   const handleCellClick = (rowIndex, field) => {
-    // console.log(rowIndex,field)
-    if(role === "Manager"){
+    //console.log(rowIndex,field)
+    if (role === "Manager") {
       setEditCell({ rowIndex, field });
     }
-    
   };
 
   const handleCellChange = (e, rowIndex, field) => {
-    // console.log(rowIndex,field)
+    //console.log(rowIndex,field)
     const newRow = [...rows];
     newRow[rowIndex][field] = e.target.value;
-    setRows(newRow);
+    //console.log(newRow)
+    const updatedRow = newRow[rowIndex];
+    // console.log({title:updatedRow.title,description:updatedRow.description })
+    // console.log({project_ID:updatedRow._id})
+    setsingleProjectUpdate({
+      title: updatedRow.title,
+      description: updatedRow.description,
+    });
+    setProjectId(updatedRow._id);
+    // console.log(singleProjectUpdate)
+    // setRows(newRow);
   };
 
   const handleBlur = () => {
-    // console.log("clicked")
+    // console.log(singleProjectUpdate)
+    dispatch(updateProject(projectId, singleProjectUpdate, token));
+    console.log("clicked");
     setEditCell({ rowIndex: null, field: "" });
   };
+
+  const handleOpenDialog = (id) => {
+    setDeleteId(id);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setDeleteId(null);
+  };
+
+  useEffect(() => {
+    dispatch(getProject(manager_id, token)).then((data) => {
+      if (data) {
+        setRows(data);
+      }
+    });
+  }, [manager_id, token, dispatch]);
 
   // aria-label="simple table"   component={Paper}
   return (
@@ -103,9 +116,8 @@ const ProjectTable = ({page}) => {
       }}
     >
       <TableContainer>
-
         {/* Header for Projects page */}
-        <Header page={page}/>
+        <Header page={page} />
         <br />
 
         {/* Table for Projects page */}
@@ -130,7 +142,9 @@ const ProjectTable = ({page}) => {
                   sx={{ color: "white" }}
                   onClick={() => handleCellClick(index, "title")}
                 >
-                  {editCell.rowIndex === index && editCell.field === "title" && role ==="Manager" ? (
+                  {editCell.rowIndex === index &&
+                  editCell.field === "title" &&
+                  role === "Manager" ? (
                     <TextField
                       value={row.title}
                       onChange={(e) => handleCellChange(e, index, "title")}
@@ -147,42 +161,50 @@ const ProjectTable = ({page}) => {
 
                 <TableCell
                   sx={{ color: "white" }}
-                  onClick={() => handleCellClick(index, "desciption")}
+                  onClick={() => handleCellClick(index, "description")}
                 >
                   {editCell.rowIndex === index &&
-                  editCell.field === "desciption" && role ==="Manager" ? (
+                  editCell.field === "description" &&
+                  role === "Manager" ? (
                     <TextField
-                      value={row.desciption}
-                      onChange={(e) => handleCellChange(e, index, "desciption")}
+                      value={row.description}
+                      onChange={(e) =>
+                        handleCellChange(e, index, "description")
+                      }
                       onBlur={handleBlur}
                       autoFocus
                       variant="standard"
                       sx={{ input: { color: "white" }, width: "100%" }}
                     />
                   ) : (
-                    row.desciption
+                    row.description
                   )}
                 </TableCell>
 
                 <TableCell>
-                  <Link to="/task"><Button
-                    sx={{
-                      color: "#5046e5",
-                      fontWeight: "bold",
-                      fontSize: "medium",
-                    }}
-                    onClick={() => handleView(index)}
-                  >
-                    View
-                  </Button></Link>
-
+                  <Link to="/task">
+                    <Button
+                      sx={{
+                        color: "#5046e5",
+                        fontWeight: "bold",
+                        fontSize: "medium",
+                      }}
+                      onClick={() => handleView(index)}
+                    >
+                      View
+                    </Button>
+                  </Link>
                 </TableCell>
 
                 <TableCell>
                   <IconButton
                     aria-label="delete"
-                    sx={{ color: "white", opacity: role ==="Manager" ? 1 : 0.3 , pointerEvents: role==="Manager" ? "auto":"none" }}
-                    onClick={() => handleDelete(index)}
+                    sx={{
+                      color: "white",
+                      opacity: role === "Manager" ? 1 : 0.3,
+                      pointerEvents: role === "Manager" ? "auto" : "none",
+                    }}
+                    onClick={() => handleOpenDialog(row._id)}
                   >
                     <DeleteIcon />
                   </IconButton>
@@ -193,12 +215,49 @@ const ProjectTable = ({page}) => {
           </TableBody>
         </Table>
 
-        <br/>
         <br />
-        <Pagination/>
+        <br />
+        <Pagination />
       </TableContainer>
+
+      {/* Delete confirmation dialog */}
+      <DeleteDialog
+        openDialog={openDialog}
+        handleCloseDialog={handleCloseDialog}
+        handleDelete={handleDelete}
+        deleteId={deleteId}
+      />
     </AppBar>
   );
 };
 
 export default ProjectTable;
+
+// const Initialrows = [
+//   {
+//     title: "Frozen yoghurt",
+//     desciption:
+//       "Frozen yoghurtFrozen yoghurtFrozen yoghurt Frozen yoghurtFrozen",
+//   },
+//   {
+//     title: "Frozen yoghurt",
+//     desciption:
+//       "Frozen yoghurtFrozen yoghurtFrozen yoghurt Frozen yoghurtFrozen",
+//   },
+//   {
+//     title: "Frozen yoghurt",
+//     desciption:
+//       "Frozen yoghurtFrozen yoghurtFrozen yoghurt Frozen yoghurtFrozen",
+//   },
+//   {
+//     title: "Frozen yoghurt",
+//     desciption:
+//       "Frozen yoghurtFrozen yoghurtFrozen yoghurt Frozen yoghurtFrozen",
+//   },
+//   {
+//     title: "Frozen yoghurt",
+//     desciption:
+//       "Frozen yoghurtFrozen yoghurtFrozen yoghurt Frozen yoghurtFrozen",
+//   },
+
+// ];
