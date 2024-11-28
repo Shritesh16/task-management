@@ -35,6 +35,8 @@ const Login = () => {
     
   // },[navigate])
 
+  //Note : use coockeeis instead of LS
+
 
   const onSubmit = (data) => {
     dispatch(getUser(data));

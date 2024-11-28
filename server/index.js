@@ -7,6 +7,8 @@ const { connection } = require("./config/db");
 const {Usermodel} = require("./models/User.model");
 const { Authenticate } = require("./middlewares/Authenticate");
 const { projectRouter } = require("./Routes/project.routes");
+const {taskRouter} = require("./routes/task.routes")
+const {userRouter} = require("./routes/user.routes")
 
 const app = express();
 app.use(cors({origin:"*"}))
@@ -34,6 +36,10 @@ app.post("/login", async(req,res)=>{
 app.use(Authenticate)
 
 app.use("/projects" ,projectRouter)
+
+app.use("/tasks", taskRouter)
+
+app.use("/users",userRouter)
 
 
 

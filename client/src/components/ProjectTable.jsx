@@ -6,6 +6,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import DeleteIcon from "@mui/icons-material/Delete";
+
 // import Paper from '@mui/material/Paper';
 import {
   AppBar,
@@ -16,17 +17,19 @@ import {
 import { useEffect, useState } from "react";
 import Header from "./Header";
 import Pagination from "./Pagination";
-import { Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { Link, useSearchParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import {
   deleteProject,
   getProject,
   updateProject,
 } from "../Redux/projectReducer/action";
 import DeleteDialog from "./DeleteDialog";
+import Loading from "./Loading";
 
 const ProjectTable = ({ page }) => {
   const [rows, setRows] = useState([]);
+
   const [singleProjectUpdate, setsingleProjectUpdate] = useState({});
   const [projectId, setProjectId] = useState("");
   const [editCell, setEditCell] = useState({ rowIndex: null, field: "" });
@@ -34,14 +37,31 @@ const ProjectTable = ({ page }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
-  const dispatch = useDispatch();
-  //const {projects} = useSelector((store) => store.projectReducer)
-  //console.log(projects)
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  const role = storedUser.user.role;
-  const manager_id = storedUser.user._id;
-  const token = storedUser.token;
+  const dispatch = useDispatch();
+  const { isLoading } = useSelector((store) => store.projectReducer);
+  // const isLoading = true
+  // console.log(isLoading)
+  //controlling projects per page
+  const currentPage = parseInt(searchParams.get("page")) || 1;
+  const limit = parseInt(searchParams.get("limit")) || 5;
+  const [totalPages, setTotalPages] = useState(0);
+  const [searchedText, setSearchText] = useState("");
+
+  const storedUser = JSON.parse(localStorage.getItem("user")) || {};
+  const role = storedUser.user.role || "";
+  const user_id = storedUser.user._id || "";
+  //const manager_id = storedUser.user._id || "";
+  const token = storedUser.token || "";
+
+  const onPageChange = (page) => {
+    setSearchParams({ page, limit });
+  };
+
+  const recievedText = (searchText) => {
+    setSearchText(searchText);
+  };
 
   const handleView = (index) => {
     //  Navigate to task page
@@ -53,6 +73,9 @@ const ProjectTable = ({ page }) => {
     console.log("clicked", projectId);
     dispatch(deleteProject(projectId, token));
     setOpenDialog(false);
+
+    // setShowAlert(true)
+    // setTimeout(()=> setShowAlert(false) , 3000)
   };
 
   const handleCellClick = (rowIndex, field) => {
@@ -97,12 +120,15 @@ const ProjectTable = ({ page }) => {
   };
 
   useEffect(() => {
-    dispatch(getProject(manager_id, token)).then((data) => {
+    dispatch(
+      getProject(user_id,role, token, currentPage, limit, searchedText)
+    ).then((data) => {
       if (data) {
-        setRows(data);
+        setRows(data.projects);
+        setTotalPages(data.totalPages);
       }
     });
-  }, [manager_id, token, dispatch]);
+  }, [user_id, role, token, dispatch, currentPage, limit, searchedText]);
 
   // aria-label="simple table"   component={Paper}
   return (
@@ -117,10 +143,8 @@ const ProjectTable = ({ page }) => {
     >
       <TableContainer>
         {/* Header for Projects page */}
-        <Header page={page} />
+        <Header page={page} recievedText={recievedText} />
         <br />
-
-        {/* Table for Projects page */}
         <Table>
           <TableHead>
             <TableRow>
@@ -131,93 +155,100 @@ const ProjectTable = ({ page }) => {
               {/* <TableCell align="right">Protein&nbsp;(g)</TableCell> */}
             </TableRow>
           </TableHead>
-
-          <TableBody>
-            {rows.map((row, index) => (
-              <TableRow
-                key={index}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell
-                  sx={{ color: "white" }}
-                  onClick={() => handleCellClick(index, "title")}
+          {isLoading ? (
+            <Loading />
+          ) : (
+            <TableBody>
+              {rows.map((row, index) => (
+                <TableRow
+                  key={index}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
-                  {editCell.rowIndex === index &&
-                  editCell.field === "title" &&
-                  role === "Manager" ? (
-                    <TextField
-                      value={row.title}
-                      onChange={(e) => handleCellChange(e, index, "title")}
-                      onBlur={handleBlur}
-                      autoFocus
-                      size="small"
-                      variant="standard"
-                      sx={{ input: { color: "white" } }}
-                    />
-                  ) : (
-                    row.title
-                  )}
-                </TableCell>
-
-                <TableCell
-                  sx={{ color: "white" }}
-                  onClick={() => handleCellClick(index, "description")}
-                >
-                  {editCell.rowIndex === index &&
-                  editCell.field === "description" &&
-                  role === "Manager" ? (
-                    <TextField
-                      value={row.description}
-                      onChange={(e) =>
-                        handleCellChange(e, index, "description")
-                      }
-                      onBlur={handleBlur}
-                      autoFocus
-                      variant="standard"
-                      sx={{ input: { color: "white" }, width: "100%" }}
-                    />
-                  ) : (
-                    row.description
-                  )}
-                </TableCell>
-
-                <TableCell>
-                  <Link to="/task">
-                    <Button
-                      sx={{
-                        color: "#5046e5",
-                        fontWeight: "bold",
-                        fontSize: "medium",
-                      }}
-                      onClick={() => handleView(index)}
-                    >
-                      View
-                    </Button>
-                  </Link>
-                </TableCell>
-
-                <TableCell>
-                  <IconButton
-                    aria-label="delete"
-                    sx={{
-                      color: "white",
-                      opacity: role === "Manager" ? 1 : 0.3,
-                      pointerEvents: role === "Manager" ? "auto" : "none",
-                    }}
-                    onClick={() => handleOpenDialog(row._id)}
+                  <TableCell
+                    sx={{ color: "white" }}
+                    onClick={() => handleCellClick(index, "title")}
                   >
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
-                {/* <TableCell align="right">{row.protein}</TableCell> */}
-              </TableRow>
-            ))}
-          </TableBody>
+                    {editCell.rowIndex === index &&
+                    editCell.field === "title" &&
+                    role === "Manager" ? (
+                      <TextField
+                        value={row.title}
+                        onChange={(e) => handleCellChange(e, index, "title")}
+                        onBlur={handleBlur}
+                        autoFocus
+                        size="small"
+                        variant="standard"
+                        sx={{ input: { color: "white" } }}
+                      />
+                    ) : (
+                      row.title
+                    )}
+                  </TableCell>
+
+                  <TableCell
+                    sx={{ color: "white" }}
+                    onClick={() => handleCellClick(index, "description")}
+                  >
+                    {editCell.rowIndex === index &&
+                    editCell.field === "description" &&
+                    role === "Manager" ? (
+                      <TextField
+                        value={row.description}
+                        onChange={(e) =>
+                          handleCellChange(e, index, "description")
+                        }
+                        onBlur={handleBlur}
+                        autoFocus
+                        variant="standard"
+                        sx={{ input: { color: "white" }, width: "100%" }}
+                      />
+                    ) : (
+                      row.description
+                    )}
+                  </TableCell>
+
+                  <TableCell>
+                    <Link to={`/task/${row._id}`}>
+                      <Button
+                        sx={{
+                          color: "#5046e5",
+                          fontWeight: "bold",
+                          fontSize: "medium",
+                        }}
+                        onClick={() => handleView(index)}
+                      >
+                        View
+                      </Button>
+                    </Link>
+                  </TableCell>
+
+                  <TableCell>
+                    <IconButton
+                      aria-label="delete"
+                      sx={{
+                        color: "white",
+                        opacity: role === "Manager" ? 1 : 0.3,
+                        pointerEvents: role === "Manager" ? "auto" : "none",
+                      }}
+                      onClick={() => handleOpenDialog(row._id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                  {/* <TableCell align="right">{row.protein}</TableCell> */}
+                </TableRow>
+              ))}
+            </TableBody>
+          )}
         </Table>
 
         <br />
         <br />
-        <Pagination />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
+        />
       </TableContainer>
 
       {/* Delete confirmation dialog */}

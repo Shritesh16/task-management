@@ -15,3 +15,9 @@ const Authenticate = (req,res, next) =>{
 
 
 module.exports = {Authenticate}
+
+
+// {
+//      title:
+//      addedMember : [mem1 , meme2]
+// }

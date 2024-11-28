@@ -21,10 +21,10 @@ const pages = [
     title: "Projects",
     path: "/project",
   },
-  {
-    title: "Tasks",
-    path: "/task",
-  },
+  // {
+  //   title: "Tasks",
+  //   path: "/task",
+  // },
 ];
 // const settings = ['profile', 'Logout'];
 

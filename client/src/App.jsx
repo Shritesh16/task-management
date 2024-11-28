@@ -17,12 +17,13 @@ function App() {
   //   const storedUser = JSON.parse(localStorage.getItem("user"));
   // const isAuthenticated = storedUser.isLogged
 
+  // routes path should be plural
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
 
       <Route path="/project" element={<Projects />} />
-      <Route path="/task" element={<Tasks />} />
+      <Route path="/task/:project_id" element={<Tasks />} />
 
       {/* <Login/> */}
       {/* <Navbar/> */}
@@ -34,24 +35,4 @@ function App() {
 
 export default App;
 
-{
-  /* <Route
-path="/project"
-element={
-  <PrivateRoute isAuthenticated={isAuthenticated}>
-    <Projects />
-  </PrivateRoute>
-}
-/>
 
-<Route
-path="/task"
-element={
-  <PrivateRoute isAuthenticated={isAuthenticated}>
-    <Tasks />
-  </PrivateRoute>
-}
-
-{/* <Route path="*" element={<Navigate to={isAuthenticated ? "/task" : "/login"} replace/>}/> */
-}
-// /> */}

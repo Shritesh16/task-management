@@ -13,7 +13,7 @@ import CreateProject from "./CreateProject";
 import CreateTask from "./CreateTask";
 import { useSelector } from "react-redux";
 
-const Header = ({ page }) => {
+const Header = ({ page , recievedText }) => {
   const [searchText, setSearchText] = useState("");
   const [debouncedText, setDebouncedText] = useState(searchText);
   const [open, setOpen] = useState(false);
@@ -36,14 +36,15 @@ const Header = ({ page }) => {
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      setDebouncedText(searchText);
+      // setDebouncedText(searchText);
+      recievedText(searchText)
     }
   };
 
   //get data from server for pojects based on Searched title
-  const fetchData = async (text) => {
-    console.log(text);
-  };
+  // const fetchData = async (text) => {
+  //   console.log(text);
+  // };
 
   //Debounching
   useEffect(() => {
@@ -54,11 +55,11 @@ const Header = ({ page }) => {
     return () => clearTimeout(timerId);
   }, [searchText]);
 
-  useEffect(() => {
-    if (debouncedText) {
-      fetchData(debouncedText);
-    }
-  }, [debouncedText]);
+  // useEffect(() => {
+  //   if (debouncedText) {
+  //     fetchData(debouncedText);
+  //   }
+  // }, [debouncedText]);
 
   return (
     <Box

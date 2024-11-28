@@ -17,8 +17,11 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { createTask } from "../Redux/taskReducer/action";
 const CreateTask = ({ handleClose, open }) => {
   const {
     register,
@@ -28,15 +31,60 @@ const CreateTask = ({ handleClose, open }) => {
   } = useForm();
 
   const [dueDate, setDueDate] = useState(null);
+  const [value, setValue] = useState("")
+  const [assigne, setAssigne] = useState([]);
+
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const token = storedUser.token;
+  const {project_id} = useParams()
+  const dispatch = useDispatch()
+
+  let manager_id = null;
+  let member_id = null;
+
+  if (storedUser.user.role === "Manager") {
+    manager_id = storedUser.user._id;
+    // console.log(manager_id,member_id)
+  } else {
+    manager_id = storedUser.user.manager;
+    member_id = storedUser.user._id;
+    // console.log(manager_id,member_id)
+  }
+
+  const fetchUsers = async (manager_id, member_id, token) => {
+    try {
+      const getAuthConfig = (token) => ({
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const resp = await axios.get(`http://localhost:8080/users?manager_id=${manager_id}&member_id=${member_id}`,
+        getAuthConfig(token)
+      );
+      // console.log(resp.data.teamMembers);
+      setAssigne(resp.data.teamMembers)
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers(manager_id, member_id, token);
+  }, [manager_id, member_id, token]);
 
   // Handle form submission
   const onSubmit = (data) => {
-    data.dueDate = dueDate.$d
-    console.log(data); // POSt form data to create task API
+    const dateObj=dueDate.$d;
+    const formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}/${String(dateObj.getMonth() + 1).padStart(2, '0')}/${dateObj.getFullYear()}`;
+    // data.dueDate = dueDate.$d;
+    data.manager_id = manager_id
+    data.project_id = project_id
+    data.member_id = value
+    data.due_date = formattedDate;
+    console.log(data); // POST form data to create task API
+    dispatch(createTask(data,token))
     handleClose();
     reset();
   };
-  
 
   return (
     <Box>
@@ -197,17 +245,16 @@ const CreateTask = ({ handleClose, open }) => {
                           {errors.dueDate.message}
                         </Typography>
                       ),
-                      InputProps:{
+                      InputProps: {
                         disableUnderline: true,
                         style: {
                           color: "white",
                           backgroundColor: "#1f2937",
                           borderRadius: "10px",
                         },
-                      }
+                      },
                     },
                   }}
-                  
                 />
               </LocalizationProvider>
 
@@ -217,9 +264,13 @@ const CreateTask = ({ handleClose, open }) => {
                 <Select
                   fullWidth
                   variant="filled"
-                  {...register("assignee", { required: "Select an assignee" })}
+                  {...register("member_id", { required: "Select an assignee" })}
                   defaultValue=""
-                  error={!!errors.assignee}
+                  error={!!errors.member_id}
+                  onChange={(event)=>{
+                     const selectedUser = assigne.find(user=> user._id === event.target.value)
+                     setValue(selectedUser._id)
+                  }}
                   sx={{
                     color: "white",
                     backgroundColor: "#1f2937",
@@ -227,13 +278,16 @@ const CreateTask = ({ handleClose, open }) => {
                     ".MuiSelect-icon": { color: "white" },
                   }}
                 >
-                  <MenuItem value="User1">User1</MenuItem>
-                  <MenuItem value="User2">User2</MenuItem>
-                  <MenuItem value="User3">User3</MenuItem>
+                  {
+                     assigne.map((user)=>(
+                      <MenuItem value={user._id} key={user._id}>{user.name}</MenuItem>
+                     ))
+                  }
+                  
                 </Select>
-                {errors.assignee && (
+                {errors.member_id && (
                   <Typography sx={{ color: "red", mt: 1 }}>
-                    {errors.assignee.message}
+                    {errors.member_id.message}
                   </Typography>
                 )}
               </Box>
